@@ -6,6 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
+    "mock:api": "node mock-server.js",
     "test": "ng test",
     "serve:ssr:pagwebprod": "node dist/pagwebprod/server/server.mjs",
     "api": "ts-node --transpile-only api-server.ts",
