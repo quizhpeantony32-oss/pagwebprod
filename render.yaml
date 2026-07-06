@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: pagwebprod
+    runtime: node
+    nodeVersion: 24.15.0
+    buildCommand: npm install && npm run build
+    startCommand: npm run serve:ssr:pagwebprod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
