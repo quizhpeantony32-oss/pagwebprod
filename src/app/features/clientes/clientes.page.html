@@ -1,0 +1,72 @@
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Relacion comercial</p>
+    <h2>Clientes</h2>
+  </div>
+  <button type="button" (click)="loadClientes()" [disabled]="loading()">Recargar</button>
+</section>
+
+<section class="grid">
+  <article class="card form-card">
+    <h3>{{ editingId() ? 'Editar cliente' : 'Nuevo cliente' }}</h3>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <label>
+        Nombre
+        <input type="text" formControlName="nombre" />
+      </label>
+
+      <label>
+        Email
+        <input type="email" formControlName="email" />
+      </label>
+
+      <label>
+        Telefono
+        <input type="text" formControlName="telefono" />
+      </label>
+
+      <label>
+        Direccion
+        <textarea formControlName="direccion" rows="3"></textarea>
+      </label>
+
+      <div class="actions">
+        <button type="submit" [disabled]="saving()">{{ editingId() ? 'Guardar cambios' : 'Crear cliente' }}</button>
+        @if (editingId()) {
+          <button type="button" class="ghost" (click)="cancelEdit()">Cancelar</button>
+        }
+      </div>
+    </form>
+
+    @if (errorMessage()) {
+      <p class="message error">{{ errorMessage() }}</p>
+    }
+  </article>
+
+  <article class="card list-card">
+    <h3>Listado</h3>
+
+    @if (loading()) {
+      <p class="message">Cargando clientes...</p>
+    } @else {
+      <div class="list">
+        @for (cliente of clientes(); track cliente.id) {
+          <section class="row">
+            <div>
+              <h4>{{ cliente.nombre }}</h4>
+              <p>{{ cliente.email }}</p>
+              <p class="meta">{{ cliente.telefono }} · {{ cliente.direccion }}</p>
+            </div>
+            <div class="row-actions">
+              <button type="button" class="ghost" (click)="startEdit(cliente)">Editar</button>
+              <button type="button" class="danger" (click)="remove(cliente)">Eliminar</button>
+            </div>
+          </section>
+        } @empty {
+          <p class="message">No hay clientes registrados.</p>
+        }
+      </div>
+    }
+  </article>
+</section>

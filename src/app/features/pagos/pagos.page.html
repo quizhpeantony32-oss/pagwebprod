@@ -1,0 +1,101 @@
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Finanzas</p>
+    <h2>Pagos</h2>
+  </div>
+  <button type="button" (click)="loadPagos()" [disabled]="loading()">Recargar</button>
+</section>
+
+<section class="grid">
+  <article class="card form-card">
+    <h3>Registrar pago</h3>
+
+    <form [formGroup]="createForm" (ngSubmit)="submitPago()" novalidate>
+      <label>
+        Venta
+        <select formControlName="ventaId">
+          <option [value]="0">Selecciona una venta</option>
+          @for (venta of ventas(); track venta.id) {
+            <option [value]="venta.id">
+              #{{ venta.id }} · {{ venta.cliente?.nombre || 'Cliente' }}
+            </option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Monto
+        <input type="number" min="0.01" step="0.01" formControlName="monto" />
+      </label>
+
+      <label>
+        Metodo de pago
+        <select formControlName="metodo">
+          @for (metodo of metodoOptions; track metodo) {
+            <option [value]="metodo">{{ metodo }}</option>
+          }
+        </select>
+      </label>
+
+      <div class="actions">
+        <button type="submit" [disabled]="saving()">Crear pago</button>
+      </div>
+    </form>
+
+    <h3 class="subheading">Filtros de busqueda</h3>
+    <form [formGroup]="filterForm" class="filters" novalidate>
+      <label>
+        Venta
+        <input type="number" min="0" step="1" formControlName="ventaId" />
+      </label>
+
+      <label>
+        Estado
+        <select formControlName="estado">
+          <option value="">Todos</option>
+          @for (estado of estadoOptions; track estado) {
+            <option [value]="estado">{{ estado }}</option>
+          }
+        </select>
+      </label>
+
+      <div class="actions">
+        <button type="button" class="ghost" (click)="loadPagos()">Aplicar filtro</button>
+        <button type="button" class="ghost" (click)="clearFilters()">Limpiar</button>
+      </div>
+    </form>
+
+    @if (errorMessage()) {
+      <p class="message error">{{ errorMessage() }}</p>
+    }
+  </article>
+
+  <article class="card list-card">
+    <h3>Listado de pagos</h3>
+
+    @if (loading()) {
+      <p class="message">Cargando pagos...</p>
+    } @else {
+      <div class="list">
+        @for (pago of pagos(); track pago.id) {
+          <section class="row">
+            <div>
+              <h4>Pago #{{ pago.id }}</h4>
+              <p>Venta #{{ pago.venta.id }} · {{ pago.metodo }} · {{ pago.fechaPago | date: 'medium' }}</p>
+              <p class="meta">{{ pago.monto | currency: 'COP' : 'symbol' : '1.0-0' }} · {{ pago.estado }}</p>
+            </div>
+
+            <div class="row-actions">
+              @if (pago.estado === 'PENDIENTE') {
+                <button type="button" class="ghost" (click)="aprobarPago(pago)">Aprobar</button>
+                <button type="button" class="danger" (click)="rechazarPago(pago)">Rechazar</button>
+              }
+            </div>
+          </section>
+        } @empty {
+          <p class="message">No hay pagos para mostrar.</p>
+        }
+      </div>
+    }
+  </article>
+</section>

@@ -1,0 +1,76 @@
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Comercial</p>
+    <h2>Ventas</h2>
+  </div>
+  <button type="button" (click)="loadData()" [disabled]="loading()">Recargar</button>
+</section>
+
+<section class="grid">
+  <article class="card form-card">
+    <h3>{{ editingId() ? 'Editar venta' : 'Nueva venta' }}</h3>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <label>
+        Cliente
+        <select formControlName="clienteId">
+          <option [value]="0">Selecciona un cliente</option>
+          @for (cliente of clientes(); track cliente.id) {
+            <option [value]="cliente.id">{{ cliente.nombre }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Fecha (opcional)
+        <input type="datetime-local" formControlName="fecha" />
+      </label>
+
+      <label>
+        Total (opcional)
+        <input type="number" min="0" step="0.01" formControlName="total" />
+      </label>
+
+      <div class="actions">
+        <button type="submit" [disabled]="saving()">{{ editingId() ? 'Guardar cambios' : 'Crear venta' }}</button>
+        @if (editingId()) {
+          <button type="button" class="ghost" (click)="cancelEdit()">Cancelar</button>
+        }
+      </div>
+    </form>
+
+    @if (errorMessage()) {
+      <p class="message error">{{ errorMessage() }}</p>
+    }
+  </article>
+
+  <article class="card list-card">
+    <h3>Listado de ventas</h3>
+
+    @if (loading()) {
+      <p class="message">Cargando ventas...</p>
+    } @else {
+      <div class="list">
+        @for (venta of ventas(); track venta.id) {
+          <section class="row">
+            <div>
+              <h4>Venta #{{ venta.id }}</h4>
+              <p>Cliente: {{ venta.cliente?.nombre || 'No disponible' }}</p>
+              <p class="meta">
+                {{ venta.fecha ? (venta.fecha | date: 'medium') : 'Sin fecha' }}
+                ·
+                {{ (venta.total ?? 0) | currency: 'COP' : 'symbol' : '1.0-0' }}
+              </p>
+            </div>
+            <div class="row-actions">
+              <button type="button" class="ghost" (click)="startEdit(venta)">Editar</button>
+              <button type="button" class="danger" (click)="remove(venta)">Eliminar</button>
+            </div>
+          </section>
+        } @empty {
+          <p class="message">No hay ventas registradas.</p>
+        }
+      </div>
+    }
+  </article>
+</section>

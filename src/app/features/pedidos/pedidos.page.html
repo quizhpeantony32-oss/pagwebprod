@@ -1,0 +1,93 @@
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Operacion</p>
+    <h2>Pedidos</h2>
+  </div>
+  <button type="button" (click)="loadData()" [disabled]="loading()">Recargar</button>
+</section>
+
+<section class="grid">
+  <article class="card form-card">
+    <h3>Crear pedido</h3>
+
+    <form [formGroup]="createForm" novalidate>
+      <label>
+        Cliente
+        <select formControlName="clienteId">
+          <option [value]="0">Selecciona un cliente</option>
+          @for (cliente of clientes(); track cliente.id) {
+            <option [value]="cliente.id">{{ cliente.nombre }}</option>
+          }
+        </select>
+      </label>
+
+      <div class="row-fields">
+        <label>
+          Producto
+          <select formControlName="productoId">
+            <option [value]="0">Selecciona un producto</option>
+            @for (producto of productos(); track producto.id) {
+              <option [value]="producto.id">{{ producto.nombre }}</option>
+            }
+          </select>
+        </label>
+
+        <label>
+          Cantidad
+          <input type="number" min="1" step="1" formControlName="cantidad" />
+        </label>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="ghost" (click)="addItem()">Agregar item</button>
+        <button type="button" (click)="submitPedido()" [disabled]="saving()">Crear pedido</button>
+      </div>
+    </form>
+
+    <div class="draft-list">
+      @for (item of draftItems(); track item.productoId) {
+        <section class="draft-row">
+          <p>{{ item.productoNombre }} · Cantidad: {{ item.cantidad }}</p>
+          <button type="button" class="danger" (click)="removeDraftItem(item.productoId)">Quitar</button>
+        </section>
+      } @empty {
+        <p class="message">No has agregado productos al pedido.</p>
+      }
+    </div>
+
+    @if (errorMessage()) {
+      <p class="message error">{{ errorMessage() }}</p>
+    }
+  </article>
+
+  <article class="card list-card">
+    <h3>Listado de pedidos</h3>
+
+    @if (loading()) {
+      <p class="message">Cargando pedidos...</p>
+    } @else {
+      <div class="list">
+        @for (pedido of pedidos(); track pedido.id) {
+          <section class="row">
+            <div>
+              <h4>Pedido #{{ pedido.id }}</h4>
+              <p>{{ pedido.cliente.nombre }} · {{ pedido.fecha | date: 'medium' }}</p>
+              <p class="meta">{{ pedido.total | currency: 'COP' : 'symbol' : '1.0-0' }}</p>
+            </div>
+
+            <div class="row-actions">
+              <select [value]="pedido.estado" (change)="changeEstado(pedido, $any($event.target).value)">
+                @for (estado of estadoOptions; track estado) {
+                  <option [value]="estado">{{ estado }}</option>
+                }
+              </select>
+              <button type="button" class="danger" (click)="deletePedido(pedido)">Eliminar</button>
+            </div>
+          </section>
+        } @empty {
+          <p class="message">No hay pedidos registrados.</p>
+        }
+      </div>
+    }
+  </article>
+</section>

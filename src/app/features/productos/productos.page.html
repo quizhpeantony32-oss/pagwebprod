@@ -1,0 +1,74 @@
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Catalogo</p>
+    <h2>Productos</h2>
+  </div>
+  <button type="button" (click)="loadProductos()" [disabled]="loading()">Recargar</button>
+</section>
+
+<section class="grid">
+  <article class="card form-card">
+    <h3>{{ editingId() ? 'Editar producto' : 'Nuevo producto' }}</h3>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <label>
+        Nombre
+        <input type="text" formControlName="nombre" />
+      </label>
+
+      <label>
+        Descripcion
+        <textarea formControlName="descripcion" rows="3"></textarea>
+      </label>
+
+      <label>
+        Precio
+        <input type="number" min="0" step="0.01" formControlName="precio" />
+      </label>
+
+      <label>
+        Stock
+        <input type="number" min="0" step="1" formControlName="stock" />
+      </label>
+
+      <div class="actions">
+        <button type="submit" [disabled]="saving()">{{ editingId() ? 'Guardar cambios' : 'Crear producto' }}</button>
+        @if (editingId()) {
+          <button type="button" class="ghost" (click)="cancelEdit()">Cancelar</button>
+        }
+      </div>
+    </form>
+
+    @if (errorMessage()) {
+      <p class="message error">{{ errorMessage() }}</p>
+    }
+  </article>
+
+  <article class="card list-card">
+    <h3>Listado</h3>
+
+    @if (loading()) {
+      <p class="message">Cargando productos...</p>
+    } @else {
+      <div class="list">
+        @for (producto of productos(); track producto.id) {
+          <section class="row">
+            <div>
+              <h4>{{ producto.nombre }}</h4>
+              <p>{{ producto.descripcion || 'Sin descripcion' }}</p>
+              <p class="meta">
+                {{ producto.precio | currency: 'COP' : 'symbol' : '1.0-0' }} · Stock: {{ producto.stock }}
+              </p>
+            </div>
+            <div class="row-actions">
+              <button type="button" class="ghost" (click)="startEdit(producto)">Editar</button>
+              <button type="button" class="danger" (click)="remove(producto)">Eliminar</button>
+            </div>
+          </section>
+        } @empty {
+          <p class="message">No hay productos registrados.</p>
+        }
+      </div>
+    }
+  </article>
+</section>

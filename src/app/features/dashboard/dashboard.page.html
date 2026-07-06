@@ -1,0 +1,112 @@
+<section class="hero" aria-labelledby="dashboard-title">
+  <div class="hero-copy">
+    <p class="eyebrow">Resumen general</p>
+    <h2 id="dashboard-title">Dashboard operativo</h2>
+    <p class="hero-text">
+      Vista central para monitorear inventario, clientes, pedidos y pagos conectados en tiempo real.
+    </p>
+
+    <div class="hero-status" role="status" aria-live="polite">
+      @if (loading()) {
+        <p class="status-card">Cargando datos del backend...</p>
+      } @else if (errorMessage()) {
+        <p class="status-card status-card--error">{{ errorMessage() }}</p>
+      } @else {
+        <p class="status-card status-card--success">Conexion activa con la API.</p>
+      }
+    </div>
+  </div>
+
+  <div class="hero-grid" aria-label="Metricas principales">
+    @for (metric of metrics(); track metric.label) {
+      <article class="metric-card">
+        <p class="metric-label">{{ metric.label }}</p>
+        <strong class="metric-value">{{ metric.value }}</strong>
+      </article>
+    }
+  </div>
+</section>
+
+<section class="focus-strip" aria-label="Modulos principales">
+  @for (section of sections; track section.title) {
+    <article class="focus-card">
+      <p class="focus-eyebrow">{{ section.eyebrow }}</p>
+      <h3>{{ section.title }}</h3>
+      <p>{{ section.description }}</p>
+    </article>
+  }
+</section>
+
+<section class="workspace" aria-label="Resumen operativo">
+  <article class="panel-card">
+    <div class="panel-card__header">
+      <h3>Inventario destacado</h3>
+      <span class="badge">{{ featuredProducts().length }}</span>
+    </div>
+
+    <div class="data-list">
+      @for (producto of featuredProducts(); track producto.id) {
+        <section class="data-row">
+          <div>
+            <h4>{{ producto.nombre }}</h4>
+            <p>{{ producto.descripcion || 'Sin descripcion' }}</p>
+          </div>
+          <div class="data-points">
+            <span>{{ producto.precio | currency: 'COP' : 'symbol' : '1.0-0' }}</span>
+            <span [class.low-stock]="producto.stock <= 5">Stock: {{ producto.stock }}</span>
+          </div>
+        </section>
+      } @empty {
+        <p class="empty-state">No hay productos disponibles.</p>
+      }
+    </div>
+  </article>
+
+  <article class="panel-card">
+    <div class="panel-card__header">
+      <h3>Pedidos recientes</h3>
+      <span class="badge">{{ latestOrders().length }}</span>
+    </div>
+
+    <div class="data-list">
+      @for (pedido of latestOrders(); track pedido.id) {
+        <section class="data-row">
+          <div>
+            <h4>Pedido #{{ pedido.id }}</h4>
+            <p>{{ pedido.cliente.nombre }} · {{ pedido.fecha | date: 'medium' }}</p>
+          </div>
+          <div class="data-points">
+            <span class="state-pill">{{ pedido.estado }}</span>
+            <span>{{ pedido.total | currency: 'COP' : 'symbol' : '1.0-0' }}</span>
+          </div>
+        </section>
+      } @empty {
+        <p class="empty-state">No hay pedidos registrados.</p>
+      }
+    </div>
+  </article>
+
+  <article class="panel-card panel-card--accent">
+    <div class="panel-card__header">
+      <h3>Pagos pendientes</h3>
+      <span class="badge badge--light">{{ pendingPayments().length }}</span>
+    </div>
+
+    <div class="data-list">
+      @for (pago of pendingPayments(); track pago.id) {
+        <section class="data-row">
+          <div>
+            <h4>Pago #{{ pago.id }}</h4>
+            <p>Venta #{{ pago.venta.id }} · {{ pago.metodo }}</p>
+          </div>
+          <div class="data-points">
+            <span>{{ pago.monto | currency: 'COP' : 'symbol' : '1.0-0' }}</span>
+            <span>{{ pago.fechaPago | date: 'short' }}</span>
+          </div>
+        </section>
+      } @empty {
+        <p class="empty-state empty-state--inverse">No hay pagos pendientes.</p>
+      }
+    </div>
+  </article>
+</section>
