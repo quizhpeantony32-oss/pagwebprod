@@ -21,7 +21,7 @@ function resolveBaseUrl(): string {
     return '/api';
   }
 
-  return 'https://productos-proyecto.onrender.com/api';
+  return '/api';
 }
 
 export const apiConfig = {

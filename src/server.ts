@@ -8,9 +8,14 @@ import express from 'express';
 import { join } from 'node:path';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
+const runtimeApiBaseUrl = process.env['API_BASE_URL']?.trim() ?? '';
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
+
+if (runtimeApiBaseUrl) {
+  (globalThis as { __API_BASE_URL__?: string }).__API_BASE_URL__ = runtimeApiBaseUrl;
+}
 
 /**
  * Example Express Rest API endpoints can be defined here.
@@ -34,6 +39,14 @@ app.use(
     redirect: false,
   }),
 );
+
+app.get('/runtime-config.js', (_req, res) => {
+  res.type('application/javascript');
+  res.setHeader('Cache-Control', 'no-store');
+  res.send(
+    `globalThis.__API_BASE_URL__ = ${JSON.stringify(runtimeApiBaseUrl || '')};`,
+  );
+});
 
 /**
  * Handle all other requests by rendering the Angular application.
